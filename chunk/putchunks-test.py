@@ -1,22 +1,6 @@
-# -----------------------------------------------------------------------------
-# Copyright (C) 2019-2020 The python-ndn authors
-#
-# This file is part of python-ndn.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# -----------------------------------------------------------------------------
 import logging
 import sys
+import time
 from ndn.utils import timestamp
 from ndn.app import NDNApp
 from ndn.encoding import Name, Component
@@ -29,10 +13,10 @@ def main():
         print(f'Usage: {sys.argv[0]} <name> <file>')
         exit(0)
     logging.basicConfig(format='[{asctime}]{levelname}:{message}',
-                        datefmt='%Y-%m-%d %H:%M:%S',
+                        datefmt="%Y-%m-%d %H:%M:%S",
                         level=logging.INFO,
-                        style='{',
-                        filename='/chunk/producerLog.txt')
+                        style='{',)
+
 
     app = NDNApp()
     name = Name.normalize(sys.argv[1])
@@ -56,7 +40,8 @@ def main():
             seg_no = 0
         if seg_no < seg_cnt:
             app.put_raw_packet(packets[seg_no])
-            logging.info(f"put raw packet seg_no: {seg_no}")
+            with open('/chunk/log.csv', 'a') as log:
+                log.write(f'{time.time()},producer,{seg_no},{len(packets[seg_no])},{Name.to_str(name)}\n')
 
     app.run_forever()
 

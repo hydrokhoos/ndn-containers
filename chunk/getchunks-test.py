@@ -1,31 +1,15 @@
-# -----------------------------------------------------------------------------
-# Copyright (C) 2019-2020 The python-ndn authors
-#
-# This file is part of python-ndn.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# -----------------------------------------------------------------------------
 import logging
 import sys
+import time
 from ndn.app import NDNApp
 from ndn.app_support.segment_fetcher import segment_fetcher
 
 
 logging.basicConfig(format='[{asctime}]{levelname}:{message}',
-                    datefmt='%Y-%m-%d %H:%M:%S',
+                    datefmt="%Y-%m-%d %H:%M:%S",
                     level=logging.INFO,
-                    style='{',
-                    filename='/chunk/consumerLog.txt')
+                    style='{',)
+
 app = NDNApp()
 
 
@@ -35,10 +19,10 @@ async def main():
     async for seg in segment_fetcher(app, sys.argv[1]):
         # print(bytes(seg).decode(), end='')
         f.write(bytes(seg))
+        with open('/chunk/log.csv', 'a') as log:
+            log.write(f'{time.time()},consumer,{cnt},{len(seg)},{sys.argv[1]}\n')
         cnt += 1
-        logging.info(f"get packet seg_no: {cnt}")
-    print(f'\n{cnt} segments fetched.')
-    logging.info(f'\n{cnt} segments fetched.')
+    print(f'{cnt} segments fetched.')
     f.close()
     app.shutdown()
 

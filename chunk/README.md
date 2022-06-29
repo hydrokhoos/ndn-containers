@@ -32,7 +32,14 @@ python3 /chunk/getchunks-test.py /theta/v=1656349826923
 ./delete_containers.sh
 ```
 
-## ログの初期化
+## ログ
+```log.csv```に保存
+
+サマリ(```summary.csv```)の出力
+```bash
+python3 analyze_log.py
+```
+
 ```bash
 sudo ./clear_log.sh
 ```
