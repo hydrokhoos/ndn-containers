@@ -43,3 +43,8 @@ python3 analyze_log.py
 ```bash
 sudo ./clear_log.sh
 ```
+
+## fetch_data.jpg, log.csv, summary.csv初期化
+```bash
+./init.sh
+```
