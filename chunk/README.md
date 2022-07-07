@@ -23,6 +23,9 @@ Created 791 chunks under name /theta/v=1656349826923
 sudo docker exec -it consumer bash
 python3 /chunk/getchunks-test.py /theta/v=1656349826923
 ```
+```bash
+791 segments fetched.
+```
 
 ## 画像の確認
 ```ndn-containers/chunk/fetch_data.jpg```
