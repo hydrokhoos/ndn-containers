@@ -1,5 +1,5 @@
 from ndn.app import NDNApp
-from ndn.encoding import Name, Component
+from ndn.encoding import Name
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
 
 
@@ -13,7 +13,7 @@ def receive_interest():
     def on_interest(name, param, _app_param):
         # remove '/relay'(service_name) from interest name
         print(f'Received Interest: {Name.to_str(name)}')
-        tmp_name = (Name.to_str(name)).replace(service_name, '')
+        tmp_name = (Name.to_str(name)).replace(service_name + '/', '/')
         name = Name.from_str(tmp_name)
         l.append(tmp_name)
 
@@ -31,7 +31,6 @@ def send_interest():
             print(f'Received Data: {Name.to_str(data_name)}')
             # print(meta_info)
             # print(bytes(content) if content else None)
-            tmp_content = content
         except InterestNack as e:
             print(f'Nacked with reason={e.reason}')
         except InterestTimeout:
