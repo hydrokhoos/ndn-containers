@@ -4,8 +4,6 @@ from ndn.encoding import Name
 from ndn.types import InterestCanceled, InterestNack, InterestTimeout, ValidationFailure
 
 
-# app = NDNApp()
-
 service_name = '/relay'
 
 
@@ -16,6 +14,7 @@ class Relayinfo:
         self.dat_org = b''
         self.dat_rld = b''
         self.is_interest_received = False
+        self.app = NDNApp()
 
     def trim_int_name(self):
         self.int_name_trm = self.int_name_org.replace(service_name + '/', '/')
@@ -32,7 +31,7 @@ class Relayinfo:
         print('#####')
 
     def receive_interest(self):
-        @app.route(service_name)
+        @self.app.route(service_name)
         def on_interest(name, param, _app_param):
             self.int_name_org = Name.to_str(name)
             print(f'Received Interest:\t{self.int_name_org}')
@@ -41,16 +40,16 @@ class Relayinfo:
             # remove '/relay'(service_name) from interest name
             self.trim_int_name()
 
-            app.shutdown()
+            self.app.shutdown()
 
         print('Start receiver ...')
-        app.run_forever()
+        self.app.run_forever()
 
     def send_interest(self):
         async def main():
             try:
                 print(f'Sending Interest:\t{Name.to_str(name)}')
-                data_name, meta_info, content = await app.express_interest(name, must_be_fresh=True, can_be_prefix=False, lifetime=6000)
+                data_name, meta_info, content = await self.app.express_interest(name, must_be_fresh=True, can_be_prefix=False, lifetime=6000)
                 print(f'Received Data Name:\t{Name.to_str(data_name)}')
                 self.dat_org = bytes(content)
             except InterestNack as e:
@@ -62,24 +61,24 @@ class Relayinfo:
             except ValidationFailure:
                 print(f'Data failed to validate')
             finally:
-                app.shutdown()
+                self.app.shutdown()
 
         name = Name.from_str(self.int_name_trm)
 
-        app.run_forever(after_start=main())
+        self.app.run_forever(after_start=main())
 
     def send_data(self):
         async def main():
             print(f'Putting Data Name:\t{self.int_name_org}')
-            app.put_data(Name.from_str(self.int_name_org), content=self.dat_rld, freshness_period=100000)
-            app.shutdown()
+            self.app.put_data(Name.from_str(self.int_name_org), content=self.dat_rld, freshness_period=100000)
+            self.app.shutdown()
 
-        app.run_forever(after_start=main())
+        self.app.run_forever(after_start=main())
 
 
 if __name__ == '__main__':
     while True:
-        app = NDNApp()
+        # app = NDNApp()
 
         relay = Relayinfo()
 
@@ -96,4 +95,4 @@ if __name__ == '__main__':
 
         relay.send_data()
 
-        relay.print_info()
+        # relay.print_info()
