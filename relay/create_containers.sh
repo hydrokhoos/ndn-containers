@@ -8,25 +8,10 @@ sudo docker run -dit --name producer --net testNet --privileged -v $(pwd):/relay
 
 ### consumer---relay---producer ###
 echo 'Initiating producer ...'
-sudo docker exec producer nfd-start
-# sudo docker exec producer ndnsec key-gen /$(whoami) | ndnsec cert-install -
-sudo docker exec producer nfdc face create udp://relay.testNet
-sudo docker exec producer nfdc route add /ndn udp://relay.testNet
-sudo docker exec producer nfdc route add prefix / nexthop udp://relay.testNet
+sudo docker exec producer bash /relay/shell/docker_producer.sh
 echo 'Initiating relay ...'
-sudo docker exec relay nfd-start
-# sudo docker exec relay ndnsec key-gen /$(whoami) | ndnsec cert-install -
-sudo docker exec relay nfdc face create udp://producer.testNet
-sudo docker exec relay nfdc face create udp://consumer.testNet
-sudo docker exec relay nfdc route add /ndn udp://producer.testNet
-sudo docker exec relay nfdc route add /ndn udp://consumer.testNet
-sudo docker exec relay nfdc route add prefix / nexthop udp://producer.testNet
-sudo docker exec relay nfdc route add prefix / nexthop udp://consumer.testNet
+sudo docker exec relay bash /relay/shell/docker_relay.sh
 echo 'Initiating consumer ...'
-sudo docker exec consumer nfd-start
-# sudo docker exec consumer ndnsec key-gen /$(whoami) | ndnsec cert-install -
-sudo docker exec consumer nfdc face create udp://relay.testNet
-sudo docker exec consumer nfdc route add /ndn udp://relay.testNetrelay
-sudo docker exec consumer nfdc route add prefix / nexthop udp://relay.testNet
+sudo docker exec consumer bash /relay/shell/docker_consumer.sh
 
 echo -e '\nCreated'
