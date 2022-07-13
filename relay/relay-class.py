@@ -78,8 +78,6 @@ class Relayinfo:
 
 if __name__ == '__main__':
     while True:
-        # app = NDNApp()
-
         relay = Relayinfo()
 
         relay.receive_interest()
