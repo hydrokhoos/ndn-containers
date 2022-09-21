@@ -36,7 +36,8 @@ def send_interest(queue, name):
 
 
 def function_relay(data):
-    # just relay
+    # append additional contents
+    data.append(b'additional segment')
     return data
 
 
@@ -51,20 +52,24 @@ def main():
         interest_name_org = Name.to_str(name)
         interest_name_trm = (Name.to_str(name)).replace(service_name + '/', '/')
 
+        if Component.get_type(Name.from_str(interest_name_trm)[-1]) == Component.TYPE_SEGMENT:
+            num = Component.to_number(Name.from_str(interest_name_trm)[-1])
+            interest_name_trm = Name.to_str(interest_name_trm).replace('/seg=' + str(num), '')
+
         thread_send_interest = threading.Thread(target=send_interest, args=(q, interest_name_trm, ))
         thread_send_interest.start()
         thread_send_interest.join()
 
         segs = q.get()
 
-        # put_data = function_relay(segs)
+        put_data = function_relay(segs)
 
-        seg_cnt = len(segs)
+        seg_cnt = len(put_data)
         if Component.get_type(Name.from_str(interest_name_org)[-1]) == Component.TYPE_SEGMENT:
             num = Component.to_number(Name.from_str(interest_name_org)[-1])
             interest_name_org = Name.to_str(name).replace('/seg=' + str(num), '')
         packets = [app.prepare_data(Name.from_str(interest_name_org) + [Component.from_segment(i)],
-                                    segs[i],
+                                    put_data[i],
                                     freshness_period=10000,
                                     final_block_id=Component.from_segment(seg_cnt - 1))
                    for i in range(seg_cnt)]
