@@ -1,4 +1,4 @@
-# get/putchunks-test
+# relay
 
 ## コンテナ・ネットワークの準備
 ```bash
