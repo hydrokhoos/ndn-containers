@@ -54,6 +54,16 @@ async def relay_function(data):
 
 
 class RelayNode(Node):
+    async def process_data(self, match, meta_info: MetaInfo, content: Optional[BinaryStr], raw_packet: BinaryStr):
+        print('here is process_data')
+        print(match.name)
+        match.name.insert(0, service_name.replace('/', ''))
+        # new_name = service_name
+        # for name in match.name:
+        #     new_name += '/' + Component.to_str(name)
+        match.provide(content, freshness_period=6000)
+        return await super().process_data(match, meta_info, content, raw_packet)
+
     async def process_int(self, match, param: InterestParam, app_param: Optional[BinaryStr], raw_packet: BinaryStr):
         print('here is process_int')
         # print(match)
@@ -63,18 +73,15 @@ class RelayNode(Node):
             new_name += '/' + Component.to_str(name)
         print(f'new_name: {new_name}')
         submatch = match.finer_match(match.name)
-        data = await submatch.express(app_param)
-        print(data)
-        # return await submatch.on_interest(param, app_param, raw_packet)
-        # return await super().process_int(match, param, app_param, raw_packet)
-
+        data, metadata = await submatch.need()
 
 
 async def main():
     # Make schema tree
     root = Node()
-    root[service_name] = SegmentedNode()
-    # root[service_name] = RelayNode()
+    # root[service_name] = SegmentedNode()
+    root[service_name] = RelayNode()
+    root['abc.txt'] = SegmentedNode()
 
 
     # Set policies
@@ -84,9 +91,9 @@ async def main():
     # Attach the tree to the face
     await root.attach(app, '/')
 
-    # data, metadata = await root.match('/file/abc.txt').express()
-    data_name, metadata, data = await app.express_interest(Name.from_str('/file/abc.txt'), must_be_fresh=True)
-    print(data)
+    # data, metadata = await root.match('abc.txt').need()
+    # data_name, metadata, data = await app.express_interest(Name.from_str('/abc.txt'), must_be_fresh=True)
+    # print(data)
 
 
     # # Read file

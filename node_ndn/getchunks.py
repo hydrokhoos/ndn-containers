@@ -8,8 +8,9 @@ app = NDNApp()
 # target_name = '/segments'
 # target_name = '/file/test.jpg'
 # target_name = '/test.jpg'
-# target_name = '/relay/file/abc.txt'
-target_name = '/file/abc.txt'
+target_name = '/relay/abc.txt'
+# target_name = '/file/abc.txt'
+# target_name = '/abc.txt'
 
 
 async def main():

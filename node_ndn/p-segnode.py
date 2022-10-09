@@ -20,8 +20,6 @@ app = NDNApp()
 filename = 'abc.txt'
 filepath = '/node/' + filename
 
-prefix = '/p/'
-
 
 class MyNode(Node):
     async def process_int(self, match, param, app_param, raw_packet):
@@ -31,8 +29,8 @@ class MyNode(Node):
 async def main():
     # Make schema tree
     root = MyNode()
-    # root['/' + filename] = SegmentedNode()
-    root['/file/' + filename] = SegmentedNode()
+    root['/' + filename] = SegmentedNode()
+    # root['/file/' + filename] = SegmentedNode()
 
     # Set policies
     cache = MemoryCache()
@@ -46,14 +44,14 @@ async def main():
     with open(filepath, 'rb') as f:
         data = f.read()
         # Put data
-        # await root.match('/' + filename).provide(data, freshness_period=60000)
-        await root.match('/file/' + filename).provide(data, freshness_period=10000)
+        await root.match('/' + filename).provide(data, freshness_period=60000)
+        # await root.match('/file/' + filename).provide(data, freshness_period=10000)
     # await cache.save(Name.normalize('/file/' + filename), data)
     await aio.sleep(0.1)
 
     # The file is ready! Check content and metadata
-    # data, metadata = await root.match('/' + filename).need()
-    data, metadata = await root.match('/file/' + filename).need()
+    data, metadata = await root.match('/' + filename).need()
+    # data, metadata = await root.match('/file/' + filename).need()
     print(f'Content size: {len(data)}')
     print(f'Content: {data[:70]} ...')
     print(f'Number of segments: {metadata["block_count"]}')

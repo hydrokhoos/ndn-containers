@@ -18,8 +18,9 @@ logging.basicConfig(format='[{asctime}]{levelname}:{message}',
 app = NDNApp()
 
 # filename = 'test.jpg'
-filename = 'abc.txt'
-# filename = 'relay/abc.txt'
+# filename = '/file/abc.txt'
+# filename = 'abc.txt'
+filename = 'relay/abc.txt'
 
 
 async def main():
@@ -38,10 +39,10 @@ async def main():
     # Try to fetch target file
     print(f'Try to fetch {filename}...')
     # data, metadata = await root.match('/' + filename).need()
-    m = root.match('p/file/' + filename).node
+    m = root.match(filename).node
     print(m)
     print(m == root[filename])
-    data, metadata = await root.match('p/file/' + filename).need()
+    data, metadata = await root.match(filename).need()
 
     # The file is ready!
     # print(f'Content size: {len(data)}')
