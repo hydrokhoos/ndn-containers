@@ -16,8 +16,8 @@ logging.basicConfig(format='[{asctime}]{levelname}:{message}',
                     style='{')
 app = NDNApp()
 
-# filename = 'test.jpg'
-filename = 'abc.txt'
+filename = 'test.jpg'
+# filename = 'abc.txt'
 filepath = '/node/' + filename
 
 filename = Name.normalize(filename)
