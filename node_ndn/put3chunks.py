@@ -1,3 +1,4 @@
+from fileinput import filename
 from ndn.utils import timestamp
 from ndn.app import NDNApp
 from ndn.encoding import Name, Component
@@ -5,14 +6,20 @@ from ndn.encoding import Name, Component
 
 SEGMENT_SIZE = 10
 
+filename = 'abc.txt'
+filepath = '/node/abc.txt'
+filename = Name.normalize(filename)
+
 
 def main():
     app = NDNApp()
 
-    name = Name.normalize('segments')
+    name = filename
     # name.append(Component.from_version(timestamp()))
 
-    data = b'abcdefghijklmnopqrstuvwxyz'
+    # data = b'abcdefghijklmnopqrstuvwxyz'
+    with open(filepath, 'rb') as f:
+        data = f.read()
     seg_cnt = (len(data) + SEGMENT_SIZE - 1) // SEGMENT_SIZE
     packets = [app.prepare_data(name + [Component.from_segment(i)],
                                     data[i*SEGMENT_SIZE:(i+1)*SEGMENT_SIZE],

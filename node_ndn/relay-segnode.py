@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from hashlib import new
 import sys
 import asyncio as aio
 import logging
@@ -54,19 +55,26 @@ async def relay_function(data):
 
 
 class RelayNode(Node):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
     async def process_data(self, match, meta_info: MetaInfo, content: Optional[BinaryStr], raw_packet: BinaryStr):
         print('here is process_data')
-        print(match.name)
-        match.name.insert(0, service_name.replace('/', ''))
+        # match.name.insert(0, Component.from_str(service_name.replace('/', '')))
+        # print(match.name)
         # new_name = service_name
         # for name in match.name:
         #     new_name += '/' + Component.to_str(name)
-        match.provide(content, freshness_period=6000)
+        # print(new_name)
+        # print(f'content: {bytes(content)}')
+        # match.provide(content, freshness_period=6000)
+        # await self.parent.match.provide(content, freshness_period=6000)
         return await super().process_data(match, meta_info, content, raw_packet)
 
     async def process_int(self, match, param: InterestParam, app_param: Optional[BinaryStr], raw_packet: BinaryStr):
         print('here is process_int')
         # print(match)
+        tmp_match = match
         match.name.pop(0)
         new_name = ''
         for name in match.name:
@@ -74,6 +82,11 @@ class RelayNode(Node):
         print(f'new_name: {new_name}')
         submatch = match.finer_match(match.name)
         data, metadata = await submatch.need()
+        print(f'Data: {bytes(data)}')
+        print(f'Data: {metadata}')
+        await self.parent.match(tmp_match.name).provide(data, freshness_period=6000)
+        print('Data provided')
+        # print(f'data: {bytes(data)}')
 
 
 async def main():
@@ -81,7 +94,7 @@ async def main():
     root = Node()
     # root[service_name] = SegmentedNode()
     root[service_name] = RelayNode()
-    root['abc.txt'] = SegmentedNode()
+    root[service_name + '/abc.txt'] = SegmentedNode()
 
 
     # Set policies
@@ -90,6 +103,8 @@ async def main():
 
     # Attach the tree to the face
     await root.attach(app, '/')
+
+    # print(root[service_name].parent is root)
 
     # data, metadata = await root.match('abc.txt').need()
     # data_name, metadata, data = await app.express_interest(Name.from_str('/abc.txt'), must_be_fresh=True)

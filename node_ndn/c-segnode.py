@@ -22,6 +22,8 @@ app = NDNApp()
 # filename = 'abc.txt'
 filename = 'relay/abc.txt'
 
+filename = Name.normalize(filename)
+
 
 async def main():
     # Make schema tree
@@ -52,7 +54,7 @@ async def main():
     print(metadata)
 
     # Save file as output file
-    output_file = 'fetched-' + filename.replace('/', '-')
+    output_file = 'fetched' + Name.to_str(filename).replace('/', '-')
     print(f'Data fetched. Saved as {output_file}')
     with open('/node/' + output_file, 'wb') as f:
         f.truncate(0)
