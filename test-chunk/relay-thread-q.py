@@ -1,4 +1,3 @@
-from re import search
 from ndn.app import NDNApp
 from ndn.encoding import Name
 from ndn.encoding import Component
@@ -9,8 +8,6 @@ from ndn.app_support.segment_fetcher import segment_fetcher
 
 import threading
 import queue
-import asyncio as aio
-import time
 
 
 service_name = '/relay'
