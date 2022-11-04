@@ -21,14 +21,14 @@ outputfile = 'fetched' + Name.to_str(target_name).replace('/', '-')
 async def main():
     cnt = 0
     data = b''
+    get = time.time()
     async for seg in segment_fetcher(app, target_name, timeout=100000):
         # print(bytes(seg)[:20])
         # print(cnt)
         data += seg
-        with open('/test-relay/log-c.csv', 'a') as f:
-            f.write(str(cnt) + ', ' + str(time.time()) + '\n')
         cnt += 1
     print(f'{cnt} segments fetched.')
+    print(f'get time: {time.time() - get}')
 
     # with open('/test-relay/log.txt', 'a') as f:
     #     f.write(str(time.time()) + '\n')
@@ -40,6 +40,4 @@ async def main():
 
 
 if __name__ == '__main__':
-    t = time.time()
     app.run_forever(after_start=main())
-    print(str(time.time()-t)[:6] + 's')

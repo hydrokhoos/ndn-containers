@@ -3,6 +3,8 @@ from ndn.app import NDNApp
 from ndn.encoding import Name, Component
 
 import time
+import queue
+time_q = queue.Queue()
 
 
 SEGMENT_SIZE = 4400
@@ -17,14 +19,10 @@ name = Name.normalize(name)
 def main():
     app = NDNApp()
 
-    # name = Name.normalize('segments')
-    # name.append(Component.from_version(timestamp()))
-
-    # data = b'abcdefghijklmnopqrstuvwxyz'
     seg_cnt = (len(data) + SEGMENT_SIZE - 1) // SEGMENT_SIZE
     packets = [app.prepare_data(name + [Component.from_segment(i)],
                                     data[i*SEGMENT_SIZE:(i+1)*SEGMENT_SIZE],
-                                    freshness_period=10000,
+                                    freshness_period=1000,
                                     final_block_id=Component.from_segment(seg_cnt - 1))
                    for i in range(seg_cnt)]
     print(f'Created {seg_cnt} chunks under name {Name.to_str(name)}')
@@ -38,16 +36,13 @@ def main():
         else:
             seg_no = 0
         if seg_no < seg_cnt:
-            # with open('/test-relay/log.txt', 'a') as f:
-            #     f.write('Producer' + ' ' + Name.to_str(int_name) + ' ' + str(time.time()) + '\n')
             # print(f'Putting a packet:\t{seg_no}')
-            with open('/test-relay/log-p.csv', 'a') as f:
-                f.write(str(seg_no) + ', ' + str(time.time()) + '\n')
             app.put_raw_packet(packets[seg_no])
-            # if seg_no + 1 == seg_cnt:
-            #     with open('/test-relay/log.txt', 'a') as f:
-            #         f.truncate(0)
-            #         f.write(str(time.time()) + '\n')
+
+            if seg_no == 0:
+                time_q.put(time.time())
+            elif seg_no == seg_cnt - 1:
+                print(f'put time: {time.time() - time_q.get()}\n')
 
     app.run_forever()
 

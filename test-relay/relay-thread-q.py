@@ -22,6 +22,9 @@ q_recent_data = queue.Queue()
 
 app = NDNApp()
 
+time_q_get = queue.Queue()
+time_q_put = queue.Queue()
+
 
 def send_interest(queue: queue.Queue, name: FormalName) -> None:
     async def interest_func(name):
@@ -31,8 +34,6 @@ def send_interest(queue: queue.Queue, name: FormalName) -> None:
         async for seg in segment_fetcher(app_thread, name, timeout=4000, retry_times=3):
             # print(f'segment {cnt}: {bytes(seg)[:10]}...')
             data += seg
-            with open('/test-relay/log-r.csv', 'a') as f:
-                f.write(str(cnt) + ', ' + str(time.time()) + ', GET\n')
             cnt += 1
         # print(f'{cnt} segments fetched.')
         queue.put(data)
@@ -127,6 +128,7 @@ async def main():
         # print('Checking recently saved data named {} ...'.format(interest['org']))
         res = search_data(q_recent_data, interest['srch'])
         if res is not None:
+        # if False:
             # hit
             # print('Data is found.')
             put_data = res
@@ -136,15 +138,19 @@ async def main():
 
             # send interest thread
             thread_send_interest = threading.Thread(target=send_interest, args=(q_content, interest['trm'], ))
+            time_q_get.put(time.time())
             thread_send_interest.start()
             thread_send_interest.join()
+            print(f'get time: {time.time() - time_q_get.get()}')
             data = q_content.get()
 
             # call service function
             # print('Calling function ...')
+            svc = time.time()
             put_data = function_relay(data)
             # put_data = function_delay(data)
             # put_data = function_gray(data)
+            print(f'service time: {time.time() - svc}')
 
             # save data
             save_data(q_recent_data, interest['srch'], put_data)
@@ -158,8 +164,11 @@ async def main():
                          put_data[interest['num']*SEGMENT_SIZE:(interest['num']+1)*SEGMENT_SIZE],
                          freshness_period=100,
                          final_block_id=Component.from_segment(seg_cnt-1))
-            with open('/test-relay/log-r.csv', 'a') as f:
-                f.write(str(interest['num']) + ', ' + str(time.time()) + ', PUT\n')
+
+            if interest['num'] == 0:
+                time_q_put.put(time.time())
+            elif interest['num'] == seg_cnt - 1:
+                print(f'put time: {time.time() - time_q_put.get()}\n')
 
         # print('Restart receiver ...')
 
