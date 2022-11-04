@@ -31,6 +31,8 @@ def send_interest(queue: queue.Queue, name: FormalName) -> None:
         async for seg in segment_fetcher(app_thread, name, timeout=4000, retry_times=3):
             # print(f'segment {cnt}: {bytes(seg)[:10]}...')
             data += seg
+            with open('/test-relay/log-r.csv', 'a') as f:
+                f.write(str(cnt) + ', ' + str(time.time()) + ', GET\n')
             cnt += 1
         # print(f'{cnt} segments fetched.')
         queue.put(data)
@@ -156,6 +158,8 @@ async def main():
                          put_data[interest['num']*SEGMENT_SIZE:(interest['num']+1)*SEGMENT_SIZE],
                          freshness_period=100,
                          final_block_id=Component.from_segment(seg_cnt-1))
+            with open('/test-relay/log-r.csv', 'a') as f:
+                f.write(str(interest['num']) + ', ' + str(time.time()) + ', PUT\n')
 
         # print('Restart receiver ...')
 

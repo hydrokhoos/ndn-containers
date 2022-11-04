@@ -41,11 +41,13 @@ def main():
             # with open('/test-relay/log.txt', 'a') as f:
             #     f.write('Producer' + ' ' + Name.to_str(int_name) + ' ' + str(time.time()) + '\n')
             # print(f'Putting a packet:\t{seg_no}')
+            with open('/test-relay/log-p.csv', 'a') as f:
+                f.write(str(seg_no) + ', ' + str(time.time()) + '\n')
             app.put_raw_packet(packets[seg_no])
-            if seg_no + 1 == seg_cnt:
-                with open('/test-relay/log.txt', 'a') as f:
-                    f.truncate(0)
-                    f.write(str(time.time()) + '\n')
+            # if seg_no + 1 == seg_cnt:
+            #     with open('/test-relay/log.txt', 'a') as f:
+            #         f.truncate(0)
+            #         f.write(str(time.time()) + '\n')
 
     app.run_forever()
 

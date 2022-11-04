@@ -6,7 +6,7 @@ import time
 
 app = NDNApp()
 
-relay = True
+relay = False
 
 filepath = '/test-relay/'
 with open(filepath + 'target_name.txt', 'r') as f:
@@ -25,6 +25,8 @@ async def main():
         # print(bytes(seg)[:20])
         # print(cnt)
         data += seg
+        with open('/test-relay/log-c.csv', 'a') as f:
+            f.write(str(cnt) + ', ' + str(time.time()) + '\n')
         cnt += 1
     print(f'{cnt} segments fetched.')
 
@@ -40,4 +42,4 @@ async def main():
 if __name__ == '__main__':
     t = time.time()
     app.run_forever(after_start=main())
-    print(str(time.time()-t)[:4] + 's')
+    print(str(time.time()-t)[:6] + 's')
