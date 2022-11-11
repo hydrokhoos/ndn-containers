@@ -69,9 +69,9 @@ def part_get_content(name: NonStrictName, start: int, stop: int, out: queue) -> 
 
 
 from concurrent import futures
-def mult_get_content(name: NonStrictName, final: int) -> bytes:
+def multi_get_content(name: NonStrictName, final: int) -> bytes:
     def _get_a_segment(_name: NonStrictName, _seg_no: int, _q: queue):
-        async def ex_int(_name, _q):
+        async def ex_int(_name: NonStrictName, _q: queue):
             _n, _m, _c = await _app.express_interest(_name, must_be_fresh=True)
             _q.put([_seg_no, _c])
             _app.shutdown()
@@ -99,7 +99,7 @@ def mult_get_content(name: NonStrictName, final: int) -> bytes:
 
 app = NDNApp()
 
-relay = True
+relay = False
 
 filepath = '/test-relay/'
 with open(filepath + 'target_name.txt', 'r') as f:
@@ -137,9 +137,9 @@ async def main():
     # thread2.join()
     # data = q1.get() + q2.get()
 
-    data = mult_get_content(target_name, 8)
+    data = multi_get_content(target_name, 8)
 
-    print(f'get time: {time.time() - get}')
+    print(f'get time: {round(time.time() - get, 5)}')
 
     # with open('/test-relay/log.txt', 'a') as f:
     #     f.write(str(time.time()) + '\n')

@@ -4,7 +4,6 @@ from ndn.encoding import Name, Component
 
 import time
 import queue
-time_q = queue.Queue()
 
 
 SEGMENT_SIZE = 4400
@@ -27,6 +26,7 @@ def main():
                    for i in range(seg_cnt)]
     print(f'Created {seg_cnt} chunks under name {Name.to_str(name)}')
 
+    time_q = queue.Queue(maxsize=seg_cnt)
 
     @app.route(name)
     def on_interest(int_name, _int_param, _app_param):
@@ -39,10 +39,16 @@ def main():
             # print(f'Putting a packet:\t{seg_no}')
             app.put_raw_packet(packets[seg_no])
 
-            if seg_no == 0:
-                time_q.put(time.time())
-            elif seg_no == seg_cnt - 1:
-                print(f'put time: {time.time() - time_q.get()}\n')
+            # timestamps
+            time_q.put([seg_no, time.time()])
+            if time_q.full():
+                # complete all segments
+                n0, t0 = time_q.get()
+                print(f'{n0}, 0')
+                while not time_q.empty():
+                    n, t = time_q.get()
+                    print(f'{n}, {round(t - t0, 5)}')
+                print(f'put time: {round(t - t0, 5)}\n')
 
     app.run_forever()
 

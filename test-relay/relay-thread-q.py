@@ -11,6 +11,8 @@ import queue
 import time
 # import cv2
 
+from kami_consumer import multi_get_content
+
 
 service_name = '/relay'
 
@@ -141,8 +143,9 @@ async def main():
             time_q_get.put(time.time())
             thread_send_interest.start()
             thread_send_interest.join()
-            print(f'get time: {time.time() - time_q_get.get()}')
             data = q_content.get()
+            # data = multi_get_content(interest['trm'], 8)
+            print(f'get time: {time.time() - time_q_get.get()}')
 
             # call service function
             # print('Calling function ...')
