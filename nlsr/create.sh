@@ -3,8 +3,8 @@ sudo docker network create testNet
 echo ''
 
 echo 'Running containers ...'
-sudo docker run -dit --name producer --net testNet --privileged -v $(pwd)/src/:/src test-nlsr
-sudo docker run -dit --name consumer --net testNet --privileged -v $(pwd)/src/:/src test-nlsr
+sudo docker run -dit --name producer --net testNet --privileged -v $(pwd)/src/:/src hydrokhoos/test-nlsr
+sudo docker run -dit --name consumer --net testNet --privileged -v $(pwd)/src/:/src hydrokhoos/test-nlsr
 echo ''
 
 echo 'Configuring security ...'
