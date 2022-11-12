@@ -1,9 +1,16 @@
 # NLSRテスト
 
-## コンテナイメージビルド
 ```bash
 cd ndn-containers/nlsr/
-sudo docker build . -t test-nlsr
+```
+
+## イメージの準備
+```bash
+sudo docker pull hydrokhoos/test-nlsr
+```
+または
+```bash
+sudo docker build . -t hydrokhoos/test-nlsr
 ```
 
 ## コンテナとネットワークの準備
