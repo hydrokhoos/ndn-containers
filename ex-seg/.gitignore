@@ -1,0 +1,8 @@
+*.png
+*.csv
+*.txt
+src/data*
+src/fetched-*
+src/*.png
+src/*.csv
+src/*.txt
