@@ -1,0 +1,29 @@
+version: '3'
+services:
+
+  sidecar:
+    image: hydrokhoos/ubuntu-ndn-python
+    # restart: always
+    volumes:
+      - ./sidecar/src/:/src/
+      - data-volume:/data/
+    # networks:
+    # - "host"
+
+  service:
+    # image: hydrokhoos/ubuntu-ndn-python
+    build: ./service
+    # restart: always
+    tty: true
+    volumes:
+      - ./service/src/:/src/
+      - data-volume:/data/
+
+volumes:
+  data-volume:
+
+
+networks:
+  default:
+    name: test-net
+    external: true
